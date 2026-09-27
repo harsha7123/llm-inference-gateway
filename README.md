@@ -12,8 +12,7 @@ This project simulates a real client request:
 | One access key per user (5 users) | Own FastAPI gateway issues `sk-...` keys, stores only SHA-256 hashes | ✅ Done |
 | Revoke a single user | `DELETE /admin/keys/{id}`, and other users keep working | ✅ Done |
 | See what users asked and what the model answered | Every request logged in SQLite, admin dashboard, and Markdown/CSV reports | ✅ Done |
-| Same gateway, self-deployed model | Modal serverless GPU + vLLM (`deploy/modal/`) | 🚧 Level 2 |
-| Enterprise AWS version | Bedrock + Lambda + API Gateway keys + CloudWatch (`deploy/aws/`) | 🚧 Level 3 |
+
 
 ---
 
@@ -49,10 +48,6 @@ Admin endpoints manage keys and logs. `/v1/chat/completions` is **OpenAI-compati
 
 ![Gateway API](docs/screenshots/gateway.png)
 
-### 3. Five user keys created
-`python scripts/create_keys.py` issues one key per user. The key is shown **once**. The database stores only its SHA-256 hash.
-
-![Keys created](docs/screenshots/creation_keys.png)
 
 ### 4. Every request logged per user
 The admin dashboard shows usage per user (requests, output tokens, average latency) and each prompt with the model's response.
@@ -91,10 +86,7 @@ llm-inference-gateway/
 │   ├── create_keys.py             # creates 5 user keys → keys.txt (git-ignored)
 │   ├── test_user.py               # acts as a user, via the official OpenAI SDK
 │   ├── admin.py                   # list / revoke keys, view logs (no secrets on screen)
-│   └── export_report.py           # exports reports/report_*.md and logs_*.csv
-├── deploy/
-│   ├── modal/serve_model.py       # Level 2: self-deployed vLLM on Modal
-│   └── aws/lambda_function.py     # Level 3: Bedrock + Lambda
+│   
 ├── docs/screenshots/              # proof images
 ├── reports/                       # exported usage reports
 ├── requirements.txt
@@ -186,14 +178,6 @@ python scripts/export_report.py                     # → reports/
 | `.env` changes ignored | `--reload` watches only `.py` files | Restart uvicorn after editing `.env` |
 | Answers repeat the question | Raw text-generation, no chat template | Use the chat endpoint, which applies the model's template |
 
-## Next steps / production ideas
-
-- [ ] Level 2: same gateway pointed at a self-deployed vLLM on **Modal** (only `.env` changes)
-- [ ] Level 3: **AWS Bedrock + Lambda + API Gateway** usage plans + **CloudWatch Logs Insights**
-- [ ] Automatic retry on `503` during cold start
-- [ ] Per-user rate limits and daily token budgets
-- [ ] PostgreSQL instead of SQLite. Deploy the gateway itself serverless
-- [ ] Streaming responses, key expiry, masking personal data in logs, log retention policy
 
 ---
 
